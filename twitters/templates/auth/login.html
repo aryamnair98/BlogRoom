@@ -1,0 +1,38 @@
+{% extends 'vanilla_base.html' %}
+{% load static %}
+
+{% block css_link %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/auth/login.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+    <div id="login-container">
+        <img src="{% static 'branding/logo.png' %}" alt="logo" />
+        <h1>Log in to BlogRoom</h1>
+
+        {% if invalid_credentials == True %}
+          <p style="color:red;">
+            Invalid Credentials!
+          </p>
+        {% endif %}
+
+        <form action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" placeholder="Username" name="username" />
+            <input type="password" placeholder="Password" name="password" />
+            <input type="submit" value="Log in" id="login-submit-btn" name="login_form_submit_btn" />
+        </form>
+
+        <p><a href="">Demo</a> . <a href="{% url 'signup' %}">Sign up for BlogRoom</a></p>
+        {% load socialaccount %}
+        
+       
+        <p>Forgot your password? <a href="{% url 'forgot_password' %}" class="reset-link">Reset it here....</a>.</p>
+  
+        <a href="{% provider_login_url 'google' next='/home/0/'%}" class="google btn"><i class="fa fa-google fa-fw">
+        </i> Login with Google+ </a>
+        
+    </div>
+
+{% endblock %}

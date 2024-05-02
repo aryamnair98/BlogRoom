@@ -1,0 +1,172 @@
+{% extends 'half_base.html' %}
+{% load static %}
+
+{% block css_link %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/settings/settings.css' %}" />
+{% endblock %}
+
+{% block content %}
+{% with page="0" %}
+
+<!-- left navigation -->
+<div id="setting-left-part">
+
+  <div id="left-part-header">
+    <h3>Settings</h3>
+  </div>
+
+  <p id="left-part-link"><a href="{% url 'settings' %}" >Profile Settings <span class="fa fa-caret-right"></span></a></p>
+  <p id="left-part-link"><a href="#" onclick="showFollowers()">Followers <span class="fa fa-caret-right"></span></a></p>
+  <p id="left-part-link"><a href="#" onclick="showFollowings()">Followings<span class="fa fa-caret-right"></span></a></p>
+
+</div>
+
+
+<!-- right content -->
+<div id="settings-right-part">
+
+  <div id="right-part-header">
+    <h3>Profile Settings</h3>
+  </div>
+
+  <div id="profile-settings">
+
+    <form method="POST" action="{% url 'settings' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Profile Photo</label>
+        <input type="file" name="profile_photo" />
+
+        <label>Banner Photo</label>
+        <input type="file" name="banner_photo" />
+
+        <label>Full Name</label>
+        <input type="text" placeholder="e.g. John Doe" name="full_name" />
+
+        <label>Bio</label>
+        <textarea placeholder="..." name="bio"></textarea>
+
+        <input type="submit" value="Save" id="save-btn" name="settings_submit_form_btn" />
+    </form>
+
+  </div>
+
+</div>
+
+
+
+  
+
+  {% comment %} <div id="followers-list" class="content-section" style="display: none;">
+
+    
+    
+
+      {% for user in who_to_follow %}
+        <a href="{% url 'other_user_profile' user.user.username %}">
+          <div id="who-to-follow-cell">
+            <div id="who-to-follow-cell-left-part">
+              {% if user.profile_photo %}
+                <div id="who-to-follow-profile-photo" style="background-image: url('{{ user.profile_photo.url }}');"></div>
+              {% else %}
+              <div id="who-to-follow-profile-photo"></div>
+              {% endif %}
+            </div>
+            <div id="who-to-follow-cell-center-part">
+              <h4>{{ user.full_name }}</h4>
+              <p>@{{ user.user.username }}</p>
+            </div>
+            <div id="who-to-follow-cell-right-part">
+              <form action="{% url 'home' page %}" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" value="{{ user.id }}" name="hidden_user_id" />
+                  <input type="submit" value="Follow" name="base_who_to_follow_submit_btn" />
+              </form>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+
+    
+ 
+
+  </div>
+  <div id="followings-list" class="content-section" style="display: none;">
+    <!-- This div will be populated with followings list -->
+    <!-- You can use Django template to render followings list here -->
+  </div>
+
+
+ {% endcomment %}
+
+ <div id="followers-list" style="display: none; width:200px; height:200px;">
+  <form>
+
+    {% for follower in user_followers %}
+      <a href="{% url 'other_user_profile' follower.user.username %}">
+        <div class="follower-cell">
+          <div class="follower-cell-left-part">
+            {% if follower.profile_photo %}
+              <div class="follower-profile-photo" style="background-image: url('{{ follower.profile_photo.url }}');"></div>
+            {% else %}
+              <div class="follower-profile-photo"></div>
+            {% endif %}
+          </div>
+          <div class="follower-cell-center-part">
+            <h4>{{ follower.full_name }}</h4>
+            <p>@{{ follower.user.username }}</p>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+    {% if user_followers|length == 0 %}
+      <p>No followers yet</p>
+    {% endif %}
+    </form>
+</div>
+
+<div id="followings-list" class="content-section" style="display: none;">
+  
+  <div class="user-list">
+    {% for following in user_followings %}
+      <a href="{% url 'other_user_profile' following.user.username %}">
+        <div class="following-cell">
+          <div class="following-cell-left-part">
+            {% if following.profile_photo %}
+              <div class="following-profile-photo" style="background-image: url('{{ following.profile_photo.url }}');"></div>
+            {% else %}
+              <div class="following-profile-photo"></div>
+            {% endif %}
+          </div>
+          <div class="following-cell-center-part">
+            <h4>{{ following.full_name }}</h4>
+            <p>@{{ following.user.username }}</p>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+    {% if user_followings|length == 0 %}
+      <p>Not following anyone yet</p>
+    {% endif %}
+  </div>
+</div>
+
+
+{% endwith %}
+<script>
+function showFollowers() {
+  document.getElementById("right-part-header").innerHTML = "<h3>Followers</h3>";
+  document.getElementById("profile-settings").style.display = "none";
+  document.getElementById("followers-list").style.display = "block";
+  document.getElementById("followings-list").style.display = "none";
+  
+  // You can make an AJAX call here to fetch and render followers list dynamically
+}
+function showFollowings() {
+  document.getElementById("right-part-header").innerHTML = "<h3>Followings</h3>";
+  document.getElementById("profile-settings").style.display = "none";
+  document.getElementById("followers-list").style.display = "none";
+  document.getElementById("followings-list").style.display = "block";
+  // You can make an AJAX call here to fetch and render followings list dynamically
+}
+</script>
+{% endblock %}

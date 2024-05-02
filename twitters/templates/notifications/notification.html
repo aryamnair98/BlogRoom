@@ -1,0 +1,54 @@
+{% extends 'main_base.html' %}
+{% load static %}
+{% comment %} {% load filters %} {% endcomment %}
+
+{% block css_link %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/notifications/notification.css' %}" />
+{% endblock %}
+
+{% block content %}
+{% with page="0" %}
+
+<!-- header -->
+<div id="notification-header">
+    <h3>Notifications</h3>
+</div>
+
+{% for notification in all_notifications %}
+  <!-- notification cells -->
+  <div id="notification-cell">
+    <div id="notification-cell-left-part">
+      <span class="fa fa-bell"></span>
+    </div>
+    <div id="notification-cell-right-part">
+      <p>
+          <a href="{% url 'other_user_profile' notification.notifier.user.username %}">@{{ notification.notifier.user.username }}</a> liked your <a href="{% url 'tweet_single' notification.tweet.id %}">tweet</a>
+      </p>
+    </div>
+  </div><!--/cell-->
+{% endfor %}
+
+{% for follow_request_notification in follow_request_notifications %}
+  <!-- follow request notification cells -->
+  <div id="notification-cell">
+    <div id="notification-cell-left-part">
+      <span class="fa fa-bell"></span>
+    </div>
+    <div id="notification-cell-right-part">
+      <p>
+          <a href="{% url 'other_user_profile' other_user_username=follow_request_notification.sender.user.username %}">@{{ follow_request_notification.sender.user.username }}</a> sent you a follow request.
+          <form action="{% url 'accept_follow_request' follow_request_id=follow_request_notification.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Accept</button>
+          </form>
+          <form action="{% url 'decline_follow_request' follow_request_id=follow_request_notification.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Decline</button>
+          </form>
+      </p> 
+    </div>
+  </div><!--/cell-->
+{% endfor %}
+
+{% endwith %}
+{% endblock %}

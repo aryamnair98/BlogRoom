@@ -1,0 +1,162 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block css_link %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/profile/profile.css' %}" />
+{% endblock %}
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+{% block content %}
+{% with page="0" %}
+
+
+<div id="profile-header">
+    <h3>{{ current_basic_user_profile.full_name }}</h3>
+    <p>{{tweet_amount}} Tweets</p>
+</div>
+
+
+<div id="profile-banner-container">
+  {% if current_basic_user_profile.banner_photo %}
+    <div id="profile-banner" style="background-image:url({{ current_basic_user_profile.banner_photo.url }})"></div>
+  {% else %}
+    <div id="profile-banner"></div>
+  {% endif %}
+
+  <div id="profile-banner-bottom-part">
+      {% if current_basic_user_profile.profile_photo %}
+        <div id="profile-photo" style="background-image:url({{ current_basic_user_profile.profile_photo.url }})"></div>
+      {% else %}
+        <div id="profile-photo"></div>
+      {% endif %}
+
+      <div id="clear"></div>
+      <a href="{% url 'settings' %}">Edit profile</a>
+      <div id="clear"></div>
+  </div>
+
+</div>
+
+<!-- bio -->
+<div id="profile-bio">
+  <h3>{{ current_basic_user_profile.full_name }}</h3>
+  <p id="bio-username">@{{ current_basic_user_profile.user.username }}</p>
+
+  <p id="bio-bio">{{ current_basic_user_profile.bio }}</p>
+
+  <p id="bio-date">{{ current_basic_user_profile.creation_date }}</p>
+
+  <p id="bio-followers"><b>{{following_amount}}</b>Following <span id="right-space"></span> <b>{{follower_amount}}</b>Followers</p>
+</div>
+
+
+<!-- navigation -->
+<div id="profile-nav">
+  <p><a href="{% url 'profile' %}">Tweets</a></p>
+</div>
+
+<!-- Follow Button -->
+
+
+
+{% for tweet in all_tweets %}
+<!-- tweets -->
+{% comment %} <div class="btn-group">
+  <a class="dropdown-toggle" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-sliders"></i>
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      <li><a class="dropdown-item" href="#">Share</a></li>
+      <li><a class="dropdown-item" href="">Delete</a></li>
+  </ul>
+</div> {% endcomment %}
+<div id="tweet-cell">
+  <div id="tweet-cell-left-part">
+    {% if tweet.user.profile_photo %}
+      <div id="tweet-cell-left-part-profile-photo" style="background-image:url('{{ tweet.user.profile_photo.url }}')"></div>
+    {% else %}
+      <div id="tweet-cell-left-part-profile-photo"></div>
+    {% endif %}
+  </div>
+
+  <div id="tweet-cell-right-part">
+    <p id="tweet-cell-header"><b><a href="{% url 'other_user_profile' tweet.user.user.username %}">{{ tweet.user.full_name }}</a></b> @{{ tweet.user.user.username }} · {{ tweet.creation_date }}</p>
+    <p>{{ tweet.content|linebreaks }}</p>
+
+    {% if tweet.image %}
+      <div id="tweet-image" style="background-image:url('{{ tweet.image.url }}')"></div>
+    {% endif %}
+
+    <div id="tweet-cell-right-part-bottom-links">
+
+      <form id="tweet-cell-comment-form" method="POST" action="{% url 'profile' %}" >
+        {% csrf_token %}
+        <input type="hidden" value="{{ tweet.id }}" name="hidden_tweet_id" />
+        <input type="submit" value="&#128262;" name="profile_tweet_comment_submit_btn"/>
+        <p>{{ tweet.tweet_comment_amount }}</p>
+      </form>
+
+      <form id="tweet-cell-like-form" method="POST" action="{% url 'profile' %}">
+        {% csrf_token %}
+        <input type="hidden" value="{{ tweet.id }}" name="hidden_tweet_id" />
+        <input type="submit" value="&#128153;" name="profile_tweet_like_submit_btn" />
+        <p>{{ tweet.tweet_like_amount }}</p>
+        
+  
+      </form>
+
+
+      
+        <!-- Edit Form -->
+        {% comment %} <form action="{% url 'profile' %}" method="POST">
+          {% csrf_token %}
+          <input type="text" name="edited_tweet_content" value="{{ tweet.content }}">
+          <input type="hidden" name="tweet_id_to_edit" value="{{ tweet.id }}">
+          <button type="submit">✏️</button>
+          
+        </form> {% endcomment %}
+        <button class="edit-tweet-btn" data-tweet-id="{{ tweet.id }}">✏️</button>
+  
+        <!-- Delete Form -->
+        <form action="{% url 'profile' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="tweet_id_to_delete" value="{{ tweet.id }}">
+          <button type="submit">❌</button>
+        </form>
+      
+    </div>
+
+  </div>
+</div>
+{% endfor %}
+
+
+{% endwith %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var editButtons = document.querySelectorAll('.edit-tweet-btn');
+  
+    editButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        var tweetId = this.getAttribute('data-tweet-id');
+        var tweetContent = prompt("Edit your tweet:", ""); // Display prompt box
+        
+        // Submit form with edited content
+        if (tweetContent !== null) {
+          var form = document.createElement('form');
+          form.setAttribute('method', 'POST');
+          form.setAttribute('action', "{% url 'profile' %}");
+          form.innerHTML = `
+            {% csrf_token %}
+            <input type="text" name="edited_tweet_content" value="${tweetContent}">
+            <input type="hidden" name="tweet_id_to_edit" value="${tweetId}">
+            <button type="submit">Submit</button>
+          `;
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+  </script>
+{% endblock %}
