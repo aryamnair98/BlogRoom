@@ -1,1 +1,2 @@
 # BlogRoom
+BlogRoom- is like making a mini version ofTwitter. It's a website where you can share shortupdates and see what others are saying. We'repuilding it to be easy to use, with features likesigning in, writing and reading posts, followingothers, getting notified, seeing popular topicsWe're using the latest web stuff to make sure itworks well and stays safe on all kinds of devices.Blog Room is all about letting people share theirthoughts and connect with others in a fun wayonline using html,css,bootstrap,python,django.
